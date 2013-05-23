@@ -10,8 +10,6 @@ class Board
   end
   
   def []=(row, col, piece)
-    #the dark squares are defined by the sum of their
-    #row and column indexes being odd. ex: 0,0 is light, 0,1 is dark
     #pieces can only be placed on dark squares
     if dark_square?([row, col])
       @grid[row][col] = piece
@@ -24,13 +22,40 @@ class Board
     location.all? {|coord| coord.between?(0,9)}
   end
   
+  #the dark squares are defined by the sum of their
+  #row and column indexes being odd. ex: 0,0 is light, 0,1 is dark
   def dark_square?(location)
     in_board?(location) && (location[0] + location[1]).odd?
   end
   
-  def square_contents(location)
-    contents = self[*location]
-    return contents.color if contents
+  #check top and bottom rows for pawns of the opposite color
+  #than what started there. Replace these with kings
+  def promote_pawns_in_row(color, row)
+    @grid[row].each_index do |col|
+      loc = [row, col]
+      if !self[*loc].nil? && self[*loc].color == color
+        self[*loc] = King.new(color, loc, self)
+      end
+    end
+  end
+  
+  def promote_pawns
+    promote_pawns_in_row(:white, 0)
+    promote_pawns_in_row(:black, 9)
+  end
+  
+  def active_pieces(color)
+    pieces_left = []
+    @grid.flatten.each do |sq|
+      if !sq.nil? && sq.color == color
+        pieces_left << sq
+      end
+    end
+    pieces_left
+  end
+  
+  def moves_possible?(color)
+    active_pieces(color).any? { |piece| !piece.blocked? }
   end
   
   def display
@@ -44,29 +69,21 @@ class Board
     nil
   end
   
-  # protected
-  
   def make_empty_grid
     @grid = Array.new(10) { Array.new(10)}
   end
   
   def place_pieces
-    #black pieces go on dark squares of first 3 rows
-    (0..2).each do |row|
-      (0..9).each do |col|
-        loc = [row, col]
-        if dark_square?(loc)
-          self[*loc] = Pawn.new(:black, loc, self)
-        end
-      end
-    end
+    start_positions = {
+      :black => (0..2),
+      :white => (7..9)
+    }
     
-    #white pieces go on dark squares of the last 3 rows
-    (7..9).each do |row|
-      (0..9).each do |col|
-        loc = [row, col]
-        if dark_square?(loc)
-          self[*loc] = Pawn.new(:white, loc, self)
+    start_positions.each do |color, rows|
+      rows.each do |row|
+        (0..9).each do |col|
+          loc = [row, col]
+          self[*loc] = Pawn.new(color, loc, self) if dark_square?(loc)
         end
       end
     end

@@ -13,13 +13,12 @@ def Checkers
   end
   
   def play
-    until @board.over?
+    while (@board.moves_possible?(@turn))
       current_player = @players[@turn]
       begin
-        move = player.turn
-        board.move_piece(move)
-      rescue
-        puts "Invalid move"
+        
+      rescue InvalidMoveError
+        puts "Invalid move. Try again"
         retry
       end
       @turn = (@turn == :white) ? :black : :white

@@ -18,11 +18,14 @@ class Piece
     @color = color
     @location = location
     @board = board
-    self
   end
   
   def inspect
     @color
+  end
+  
+  def blocked?
+    @directions.none? {|dir| can_move?(dir) || can_jump?(dir)}
   end
   
   def jump(direction)
@@ -30,7 +33,7 @@ class Piece
     jump_space = @board[*jump_space_coords]
     destination = add_offset(jump_space_coords, direction)
     
-    if can_jump?(direction, jump_space, destination)
+    if can_jump?(direction)
       @board[*@location] = nil
       @board[*jump_space_coords] = nil
       @board[*destination] = self
@@ -38,6 +41,15 @@ class Piece
     else
       raise InvalidMoveError.new("Can't jump #{direction} to #{destination}")
     end
+  end
+  
+  def can_jump?(direction)
+    jump_space_coords = add_offset(@location, direction)
+    jump_space = @board[*jump_space_coords]
+    destination = add_offset(jump_space_coords, direction)
+    
+    valid_direction?(direction) && valid_destination?(destination) &&
+      !jump_space.nil? && (jump_space.color == opponent)
   end
   
   def move(direction)
@@ -52,15 +64,12 @@ class Piece
     end
   end
   
-  def can_move?(direction, destination)
+  def can_move?(direction)
+    destination = add_offset(@location, direction)
     valid_direction?(direction) && valid_destination?(destination)
   end
   
-  def can_jump?(direction, jump_space, destination)
-    valid_direction?(direction) && valid_destination?(destination) &&
-      !jump_space.nil? && (jump_space.color == opponent)
-  end
-  
+  #move into board class
   def valid_destination?(destination)
     @board.dark_square?(destination) && @board[*destination].nil?
   end
@@ -91,6 +100,8 @@ class Pawn < Piece
   def initialize(color, location, board)
     super(color, location, board)
     case color
+      #change sets to arrays, since they are short.
+      #also, make this a terery
     when :white
       @directions = Set.new [:up_left, :up_right]
     when :black
