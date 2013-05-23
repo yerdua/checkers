@@ -1,6 +1,8 @@
+require_relative 'piece'
 class Board
   def initialize
     make_empty_grid
+    place_pieces
   end
   
   def [](row, col)
@@ -37,19 +39,19 @@ class Board
   
   def place_pieces
     #black pieces go on dark squares of first 3 rows
-    (0..2).each do |row_index|
-      (0..9).each do |col_index|
-        if (row_index + col_index).odd?
-          self[row_index, col_index] = Piece.new(:black)
+    (0..2).each do |row|
+      (0..9).each do |col|
+        if (row + col).odd?
+          self[row, col] = Pawn.new(:black, [row, col])
         end
       end
     end
     
     #white pieces go on dark squares of the last 3 rows
-    (7..9).each do |row_index|
-      (0..9).each do |col_index|
-        if (row_index + col_index).odd?
-          self[row_index, col_index] = Piece.new(:white)
+    (7..9).each do |row|
+      (0..9).each do |col|
+        if (row + col).odd?
+          self[row, col] = Pawn.new(:white, [row, col])
         end
       end
     end
