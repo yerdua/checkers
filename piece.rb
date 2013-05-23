@@ -2,8 +2,18 @@
 
 class Piece
   attr_accessor :location
-  def initialize(color, location)
+  def initialize(color, location, board)
     @color = color
+  end
+  
+  def inspect
+    @color
+  end
+  
+  def move(destination)
+    unless (destination[0] + destination[1]).odd?
+      raise ArgumentError.new("C")
+    end
   end
 
 end
