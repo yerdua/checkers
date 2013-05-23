@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 
 class Piece
+  DELTAS = {
+    :up_right => [-1, 1],
+    :up_left => [-1, -1],
+    :down_right => [1, 1],
+    :down_left => [1, -1]
+  }
+  
   attr_accessor :location
   def initialize(color, location, board)
     @color = color
@@ -24,6 +31,18 @@ class Pawn < Piece
     :black => '⚫'
   }
   
+  attr_reader @directions
+  
+  def initialize(color, location, board)
+    super(color, location, board)
+    case color
+    when :white
+      @directions = Set.new [:up_left, :up_right]
+    when :black
+      @directions = Set.new [:down_left, :down_right]
+    end
+  end
+  
   def to_s
     SYMBOLS[@color]
   end
@@ -34,6 +53,11 @@ class King < Piece
     :white => '⚪K',
     :black => '⚫K'
   }
+  
+  def initialize(color, location, board)
+    super(color, location, board)
+    @directions = Set.new [:up_left, :up_right, :down_left, :down_right]
+  end
   
   def to_s
     SYMBOLS[@color]
