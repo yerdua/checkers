@@ -18,6 +18,10 @@ class Board
     end
   end
   
+  def free_space?(location)
+    dark_square?(location) && self[*location].nil?
+  end
+  
   def in_board?(location)
     location.all? {|coord| coord.between?(0,9)}
   end
@@ -28,6 +32,7 @@ class Board
     in_board?(location) && (location[0] + location[1]).odd?
   end
   
+  #move to piece class
   #check top and bottom rows for pawns of the opposite color
   #than what started there. Replace these with kings
   def promote_pawns_in_row(color, row)
@@ -39,6 +44,7 @@ class Board
     end
   end
   
+  #move to piece class
   def promote_pawns
     promote_pawns_in_row(:white, 0)
     promote_pawns_in_row(:black, 9)
@@ -83,7 +89,7 @@ class Board
       rows.each do |row|
         (0..9).each do |col|
           loc = [row, col]
-          self[*loc] = Pawn.new(color, loc, self) if dark_square?(loc)
+          self[*loc] = Piece.new(color, loc, self) if dark_square?(loc)
         end
       end
     end

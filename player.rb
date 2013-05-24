@@ -1,9 +1,8 @@
 class HumanPlayer
-  attr_reader :name, :board
+  attr_reader :name
   
-  def initialize(name, board)
+  def initialize(name)
     @name = name
-    @board = board
   end
   
   def select_piece
@@ -12,24 +11,19 @@ class HumanPlayer
     piece_coords.map!(&:to_i)  
   end
   
-  def select_move_type
-    puts "(J)ump or (N)ormal move?"
-    gets.chomp.upcase
-  end
-  
-  def select_direction
+  def select_directions
     puts "Which direction? options: 'up_left, up_right, down_left, down_right'"
-    gets.chomp
+    puts "If doing multiple jumps, include all the directions in order"
+    puts "If any of the jumps are invalid, the jumps will stop"
+    gets.chomp.split(',').map(&:strip)
   end
   
   def get_move
     piece_coords = select_piece
-    move_type = select_move_type
-    direction = select_direction
+    directions = select_directions
     
     { :piece_coords => piece_coords,
-      :move_type => move_type,
-      :direction => direction }
+      :directions => directions }
   end
 
 end
