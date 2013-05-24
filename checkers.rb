@@ -1,7 +1,9 @@
-require_relative 'board'
-require_relative 'piece'
+require './board.rb'
+require './piece.rb'
+require './player.rb'
+require './exceptions.rb'
 
-class CheckersGame
+class Checkers
 
   def initialize(player1, player2)
     @players = {
@@ -32,11 +34,12 @@ class CheckersGame
           raise InvalidMoveError.new("can't move opponent's piece")
         end
         
-        unless directions.all? {|d| piece.valid_direction?(d)}
+        #only check the first listed direction, in case it becomes a king
+        unless piece.valid_direction?(directions.first)
           raise InvalidMoveError.new("invalid direction for this piece")
         end
         
-        directions.map!(&:to_sym)
+        # directions.map!(&:to_sym)
         
         piece.move(directions)
       rescue InvalidMoveError => err
@@ -45,6 +48,8 @@ class CheckersGame
       end
       @turn = (@turn == :white) ? :black : :white
     end
+    winner = @board.winner
+    puts "The winner is #{players[winner]}!"
   end
 
 end

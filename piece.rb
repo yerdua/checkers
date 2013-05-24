@@ -42,7 +42,7 @@ class Piece
   def move(directions)
     jumped = false
     
-    dir = directions.shift
+    dir = directions.shift.to_sym
     if can_jump?(dir)
       jump(dir)
       jumped = true
@@ -88,8 +88,13 @@ class Piece
       until directions.empty?
         begin
           dir = directions.shift
-          jump(dir) if can_jump?(dir)
-          @king = true if reached_other_side?
+          if valid_direction?(dir)
+            dir = dir.to_sym
+            jump(dir) if can_jump?(dir)
+            @king = true if reached_other_side?
+          else
+            raise InvalidMoveError
+          end
         rescue InvalidMoveError
           puts "multiple jumps failed"
         end

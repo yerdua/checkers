@@ -64,6 +64,16 @@ class Board
     active_pieces(color).any? { |piece| !piece.blocked? }
   end
   
+  def winner
+    if !moves_possible?(:black)
+      :white
+    elsif !moves_possible(:white)
+      :black
+    else
+      nil
+    end
+  end
+  
   def display
     @grid.each do |row|
       r = row.map do |sq|
